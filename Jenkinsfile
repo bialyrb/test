@@ -26,14 +26,6 @@ pipeline {
     stage('EC2 TF Plan') {
       steps {
         dir("${env.WORKSPACE}/ec2") {
-          script {
-            try {
-              sh "terraform workspace new ${params.TF_WORKSPACE}"
-            } catch (err) {
-              sh "terraform workspace select ${env.WORKSPACE}"
-              sh "terraform workspace show"
-            }
-          }
           sh "terraform plan -input=false -out ec2.tfplan"
           sh "terraform show -no-color ec2.tfplan > ec2.tfplan.txt"
         }
