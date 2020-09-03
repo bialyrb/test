@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    node('Jenkins_slave_1')
+    node('Jenkins_slave_2')
   }
 
   parameters {
