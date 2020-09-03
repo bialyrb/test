@@ -31,6 +31,7 @@ pipeline {
               sh "terraform workspace new ${params.TF_WORKSPACE}"
             } catch (err) {
               sh "terraform workspace select ${params.TF_WORKSPACE}"
+              sh "terraform workspace show"
             }
           }
           sh "terraform plan -input=false -out ec2.tfplan"
