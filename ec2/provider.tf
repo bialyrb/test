@@ -1,3 +1,9 @@
-provider "aws" {
-  region = "us-east-1"
+terraform {
+  required_providers {
+    docker = {
+      source = "terraform-providers/docker"
+    }
+  }
 }
+
+provider "docker" {}
