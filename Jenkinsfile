@@ -26,13 +26,15 @@ pipeline {
     stage('EC2 TF Plan') {
       steps {
         dir("ec2/") {
-          try {
-            sh "terraform workspace new ${params.WORKSPACE}"
-          } catch (err) {
-            sh "terraform workspace select ${params.WORKSPACE}"
+          script {
+            try {
+              sh "terraform workspace new ${params.WORKSPACE}"
+            } catch (err) {
+              sh "terraform workspace select ${params.WORKSPACE}"
+            }
+            sh "terraform plan -input=false -out ec2.tfplan;echo \$? > status"
+            stash name: "ec2-plan", includes: "ec2.tfplan"
           }
-          sh "terraform plan -input=false -out ec2.tfplan;echo \$? > status"
-          stash name: "ec2-plan", includes: "ec2.tfplan"
         }
       }
     }
