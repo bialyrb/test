@@ -30,7 +30,7 @@ pipeline {
             try {
               sh "terraform workspace new ${params.TF_WORKSPACE}"
             } catch (err) {
-              sh "terraform workspace select ${params.TF_WORKSPACE}"
+              sh "terraform workspace select ${env.WORKSPACE}"
               sh "terraform workspace show"
             }
           }
