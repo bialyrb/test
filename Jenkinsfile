@@ -4,7 +4,6 @@ pipeline {
   parameters {
     // Adding terraform worksapce parameter for selecting infrastructure environment
     string(name: 'WORKSPACE', defaultValue: 'development', description: 'Workspace/environment for deployment')
-    booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
   }
 
   environment {
