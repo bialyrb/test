@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    node('Jenkins_slave_1')
+  }
 
   parameters {
     // Adding terraform worksapce parameter for selecting infrastructure environment
