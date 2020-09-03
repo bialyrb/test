@@ -1,9 +1,3 @@
-terraform {
-  required_providers {
-    docker = {
-      source = "terraform-providers/docker"
-    }
-  }
+provider "local" {
+  #ß  version = "~> 1.4"
 }
-
-provider "docker" {}
