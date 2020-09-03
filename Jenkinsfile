@@ -17,7 +17,7 @@ pipeline {
     stage('EC2 TF Init/Validate') {
       steps {
         // Using dir step for changing directory
-        dir("${env.WORKSPACE}/ec2") {
+        dir("ec2/") {
           sh 'terraform init -input=false'
           sh 'terraform validate'
         }
@@ -25,7 +25,7 @@ pipeline {
     }
     stage('EC2 TF Plan') {
       steps {
-        dir("${env.WORKSPACE}/ec2") {
+        dir("ec2/") {
           sh "terraform plan -input=false -out ec2.tfplan"
           sh "terraform show -no-color ec2.tfplan > ec2.tfplan.txt"
         }
@@ -41,7 +41,7 @@ pipeline {
 
       steps {
         script {
-          //def plan = readFile 'ec2.tfplan.txt'
+          def plan = readFile 'ec2.tfplan.txt'
           input message: "Do you want to apply the plan?",
             parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
         }
@@ -50,7 +50,7 @@ pipeline {
 
     stage('EC2 TF Apply') {
       steps {
-        dir("${env.WORKSPACE}/ec2") {
+        dir("ec2/") {
           sh "terraform apply -input=false ec2.tfplan"
         }
       }
