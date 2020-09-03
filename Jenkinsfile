@@ -10,7 +10,6 @@ pipeline {
   environment {
   //  AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
   //  AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    PATH = "/usr/bin:$PATH"
     TF_IN_AUTOMATION      = "TRUE"
   }
 
@@ -19,8 +18,8 @@ pipeline {
       steps {
         // Using dir step for changing directory
         dir("${env.WORKSPACE}/ec2") {
-          sh '/usr/bin/terraform init -input=false'
-          sh '/usr/bin/terraform validate'
+          sh 'terraform init -input=false'
+          sh 'terraform validate'
         }
       }
     }
@@ -29,13 +28,13 @@ pipeline {
         dir("${env.WORKSPACE}/ec2") {
           script {
             try {
-              sh "/usr/bin/terraform workspace new ${params.TF_WORKSPACE}"
+              sh "terraform workspace new ${params.TF_WORKSPACE}"
             } catch (err) {
-              sh "/usr/bin/terraform workspace select ${params.TF_WORKSPACE}"
+              sh "terraform workspace select ${params.TF_WORKSPACE}"
             }
           }
-          sh "/usr/bin/terraform plan -input=false -out ec2.tfplan"
-          sh "/usr/bin/terraform show -no-color ec2.tfplan > ec2.tfplan.txt"
+          sh "terraform plan -input=false -out ec2.tfplan"
+          sh "terraform show -no-color ec2.tfplan > ec2.tfplan.txt"
         }
       }
     }
@@ -59,7 +58,7 @@ pipeline {
     stage('EC2 TF Apply') {
       steps {
         dir("${env.WORKSPACE}/ec2") {
-          sh "/usr/bin/terraform apply -input=false ec2.tfplan"
+          sh "terraform apply -input=false ec2.tfplan"
         }
       }
     }
