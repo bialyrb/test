@@ -3,7 +3,7 @@ pipeline {
 
   parameters {
     // Adding terraform worksapce parameter for selecting infrastructure environment
-    //string(name: 'TF_WORKSPACE', defaultValue: 'development', description: 'Workspace/environment for deployment')
+    string(name: 'WORKSPACE', defaultValue: 'development', description: 'Workspace/environment for deployment')
     booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
   }
 
@@ -26,40 +26,34 @@ pipeline {
     stage('EC2 TF Plan') {
       steps {
         dir("ec2/") {
-          sh "terraform plan -input=false -out ec2.tfplan"
-          sh "terraform show -no-color ec2.tfplan > ec2.tfplan.txt"
+          try {
+            sh "terraform workspace new ${params.WORKSPACE}"
+          } catch (err) {
+            sh "terraform workspace select ${params.WORKSPACE}"
+          }
+          sh "terraform plan -input=false -out ec2.tfplan;echo \$? > status"
+          stash name: "ec2-plan", includes: "ec2.tfplan"
         }
       }
     }
 
     stage('EC2 TF Approval') {
-      when {
-        not {
-          equals expected: true, actual: params.autoApprove
-        }
-      }
-
       steps {
         script {
-          def plan = readFile 'ec2.tfplan.txt'
-          input message: "Do you want to apply the plan?",
-            parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+          def apply = false
+          try {
+            input message: "Do you want to apply the plan?", ok: 'Apply Config'
+          } catch (err) {
+            apply = false
+            currentBuild.result = 'UNSTABLE'
+          }
+          if(apply) {
+            dir("ec2/") {
+              sh "terraform apply -input=false ec2.tfplan"
+            }
+          }
         }
       }
-    }
-
-    stage('EC2 TF Apply') {
-      steps {
-        dir("ec2/") {
-          sh "terraform apply -input=false ec2.tfplan"
-        }
-      }
-    }
-  }
-
-  post {
-    always {
-      archiveArtifacts artifacts: 'ec2.tfplan.txt'
     }
   }
 }
